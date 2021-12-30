@@ -25,7 +25,7 @@
 			}
 			recognition.onresult = function(event) {
 				var col=event.results[0][0].transcript
-				document.getElementById("output").innerHTML="Did you say '"+col+"'?";
+				document.getElementById("output").innerHTML=""+col+"?";
 				document.querySelector('html').style.backgroundColor=col;
 			}
 			recognition.onspeechend = function() {
