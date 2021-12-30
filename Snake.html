@@ -1,0 +1,289 @@
+<html>
+	<head>
+		<title>Snake Game</title>
+		<style>
+			button {
+				height: 160;
+				width: 160;
+				font-size: 100px;
+				border-radius: 40px;
+				box-shadow: 0 9px #999;
+				background-color: #000;
+				color: white;
+				touch-action: none;
+			}
+
+			button:active {
+				box-shadow: 0 5px #666;
+				transform: translateY(4px);
+			}
+
+			p {
+				font-size: 50px;
+				font-weight: bold;
+				touch-action: none;
+			}
+
+			.maindiv {
+				touch-action: none;
+			}
+		</style>
+		<script type="text/javascript">
+			d = 0;
+			found = 0;
+			run = 1;
+			foodc = 'rgb(255,255,255)';
+			backc = 'rgb(0,0,0)';
+			snakec = 'rgb(255,255,255)';
+			pause = false;
+			del = 250;
+			window.onload = function() {
+				document.body.style.zoom = "100%";
+				document.body.onkeydown = function(e) {
+					if (e.keyCode === 37) {
+						press(2);
+					}
+					if (e.keyCode === 38) {
+						press(1);
+					}
+					if (e.keyCode === 39) {
+						press(0);
+					}
+					if (e.keyCode === 40) {
+						press(3);
+					}
+					if (e.keyCode === 32) {
+						canvClick();
+					}
+				}
+				;
+				alert("Ready to start?");
+				var canv = document.getElementById("canvas");
+				canv.width = window.innerWidth - 100;
+				var pix = Math.ceil(canv.width / 40);
+				canv.width = pix * 40;
+				canv.height = pix * 40;
+				var wid = canv.width;
+				var ht = canv.height;
+				var cont = canv.getContext("2d");
+				var snake = [{
+					x: 3,
+					y: ht / (2 * pix)
+				}, {
+					x: 4,
+					y: ht / (2 * pix)
+				}, {
+					x: 5,
+					y: ht / (2 * pix)
+				}];
+				var food = {
+					x: Math.floor(Math.random() * (wid / pix - 1)),
+					y: Math.floor(Math.random() * (ht / pix - 1))
+				};
+				var row = wid / pix;
+				var col = ht / pix;
+				setInterval(function() {
+					if (run === 1 && document.visibilityState === "visible" && pause === false) {
+						if (d === 0) {
+							if ((snake[snake.length - 1].x + 1 + row) % row === food.x && snake[snake.length - 1].y === food.y) {
+								snake.push(food);
+								food = nf(snake, wid, ht, pix);
+								found = 1;
+							}
+						}
+						if (d === 1) {
+							if (snake[snake.length - 1].x === food.x && (snake[snake.length - 1].y - 1 + col) % col === food.y) {
+								snake.push(food);
+								food = nf(snake, wid, ht, pix);
+								found = 1;
+							}
+						}
+						if (d === 2) {
+							if ((snake[snake.length - 1].x - 1 + row) % row === food.x && snake[snake.length - 1].y === food.y) {
+								snake.push(food);
+								food = nf(snake, wid, ht, pix);
+								found = 1;
+							}
+						}
+						if (d === 3) {
+							if (snake[snake.length - 1].x === food.x && (snake[snake.length - 1].y + 1 + col) % col === food.y) {
+								snake.push(food);
+								food = nf(snake, wid, ht, pix);
+								found = 1;
+							}
+						}
+						if (found === 0) {
+							for (i = 0; i < snake.length - 1; i++) {
+								snake[i] = snake[i + 1];
+							}
+							if (d === 0) {
+								if (incl(snake, (snake[snake.length - 1].x + 1 + row) % row, snake[snake.length - 1].y)) {
+									snake = gameOver(snake, ht, pix);
+								}
+								snake[snake.length - 1] = {
+									x: (snake[snake.length - 1].x + 1 + row) % row,
+									y: snake[snake.length - 1].y
+								};
+							}
+							if (d === 1) {
+								if (incl(snake, snake[snake.length - 1].x, (snake[snake.length - 1].y - 1 + col) % col)) {
+									snake = gameOver(snake, ht, pix);
+								}
+								snake[snake.length - 1] = {
+									x: snake[snake.length - 1].x,
+									y: (snake[snake.length - 1].y - 1 + col) % col
+								};
+							}
+							if (d === 2) {
+								if (incl(snake, (snake[snake.length - 1].x - 1 + row) % row, snake[snake.length - 1].y)) {
+									snake = gameOver(snake, ht, pix);
+								}
+								snake[snake.length - 1] = {
+									x: (snake[snake.length - 1].x - 1 + row) % row,
+									y: snake[snake.length - 1].y
+								};
+							}
+							if (d === 3) {
+								if (incl(snake, snake[snake.length - 1].x, (snake[snake.length - 1].y + 1 + col) % col)) {
+									snake = gameOver(snake, ht, pix);
+								}
+								snake[snake.length - 1] = {
+									x: snake[snake.length - 1].x,
+									y: (snake[snake.length - 1].y + 1 + col) % col
+								};
+							}
+						} else {
+							found = 0;
+						}
+						dec(cont, wid, ht, pix, food);
+						ds(snake, cont, pix);
+					}
+				}, del);
+			}
+			;
+			function nf(snake, wid, ht, pix) {
+				for (; ; ) {
+					food = {
+						x: Math.floor(Math.random() * (wid / pix - 1)),
+						y: Math.floor(Math.random() * (ht / pix - 1))
+					};
+					if (!snake.includes(food)) {
+						break;
+					}
+				}
+				return food;
+			}
+			function gameOver(snake, ht, pix) {
+				window.alert("Game Over: Score is " + (snake.length - 3));
+				if (confirm("Do you want to play again?")) {
+					d = 0;
+					return [{
+						x: 3,
+						y: ht / (2 * pix)
+					}, {
+						x: 4,
+						y: ht / (2 * pix)
+					}, {
+						x: 5,
+						y: ht / (2 * pix)
+					}];
+				} else {
+					run = 0;
+					document.getElementById("over").innerHTML = "GAMEOVER";
+					return snake;
+				}
+			}
+			function incl(snake, x, y) {
+				for (i = 0; i < snake.length; i++) {
+					if (snake[i].x === x && snake[i].y === y) {
+						return true;
+					}
+				}
+				return false;
+			}
+			function dec(cont, wid, ht, pix, food) {
+				cont.fillStyle = 'rgb(255,255,255)';
+				cont.fillRect(0, 0, wid, ht);
+				for (i = 0; i < wid / pix; i++) {
+					for (j = 0; j < ht / pix; j++) {
+						cont.fillStyle = backc;
+						cont.fillRect(i * pix, j * pix, pix, pix);
+						if (food.x === i && food.y === j) {
+							cont.fillStyle = foodc;
+							cont.fillRect(i * pix, j * pix, pix, pix);
+						}
+					}
+				}
+			}
+			function ds(snake, cont, pix) {
+				for (i = 0; i < snake.length; i++) {
+					cont.fillStyle = snakec;
+					cont.fillRect(snake[i].x * pix, snake[i].y * pix, pix, pix);
+				}
+				document.getElementById('sc').innerHTML = "SCORE: " + (snake.length - 3);
+			}
+			function press(n) {
+				if (!pause) {
+					if (n === 0) {
+						if (d != 0 && d != 2) {
+							d = 0;
+						}
+					}
+					if (n === 1) {
+						if (d != 1 && d != 3) {
+							d = 1;
+						}
+					}
+					if (n === 2) {
+						if (d != 2 && d != 0) {
+							d = 2;
+						}
+					}
+					if (n === 3) {
+						if (d != 3 && d != 1) {
+							d = 3;
+						}
+					}
+				}
+			}
+			function canvClick() {
+				if (pause === true) {
+					pause = false;
+				} else {
+					pause = true;
+				}
+			}
+		</script>
+	</head>
+	<body align="center">
+		<div class="maindiv">
+			<p id="sc">SCORE: 0</p>
+			<canvas id="canvas" width="0" height="0" onclick="javascript:canvClick();">
+				<p>Your browser doesn't support canvas</p>
+			</canvas>
+			<br>
+			<br>
+			<table align=center>
+				<tr>
+					<td></td>
+					<td>
+						<button id="up" onclick="javascript:press(1);">&#8657;</button>
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>
+						<button id="left" onclick="javascript:press(2);">&#8656;</button>
+					</td>
+					<td>
+						<button id="down" onclick="javascript:press(3);">&#8659;</button>
+					</td>
+					<td>
+						<button id="right" onclick="javascript:press(0);">&#8658;</button>
+					</td>
+				</tr>
+			</table>
+			<p id="over"></p>
+		</div>
+	</body>
+</html>
