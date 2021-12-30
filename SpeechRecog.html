@@ -1,0 +1,40 @@
+<html manifest="file.webapp">
+	<head>
+		<title>SpeechRecog</title>
+	</head>
+	<body>
+		<p id="output">Waiting...</p>
+		<button id="start">Start</button>
+		<script type="text/javascript">
+			var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+			var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+			var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+			var colors = [];
+			var grammar = '#JSGF V1.0; grammar colors; public <color> = ' + colors.join(' | ') + ' ;'
+			var recognition = new SpeechRecognition();
+			var speechRecognitionList = new SpeechGrammarList();
+			speechRecognitionList.addFromString(grammar, 1);
+			recognition.grammars = speechRecognitionList;
+			recognition.continuous = false;
+			recognition.lang = 'en-US';
+			recognition.interimResults = false;
+			recognition.maxAlternatives = 1;
+			document.getElementById("start").onclick=function() {
+				document.getElementById("start").innerHTML="Listening...";
+				recognition.start();
+			}
+			recognition.onresult = function(event) {
+				var col=event.results[0][0].transcript
+				document.getElementById("output").innerHTML="Did you say '"+col+"'?";
+				document.querySelector('html').style.backgroundColor=col;
+			}
+			recognition.onspeechend = function() {
+				document.getElementById("start").innerHTML="Start";
+				recognition.stop();
+			}
+			recognition.onerror = function(event) {
+				window.alert(event.error);
+			}
+		</script>
+	</body>
+</html>
