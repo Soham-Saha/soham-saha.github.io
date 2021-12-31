@@ -1,44 +1,22 @@
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<title>SpeechRecog</title>
 		<style>
-			body, html {
-			margin: 0;
-			}
-			html {
-			height: 100%;
-			}
 			body {
-			height: inherit;
-			overflow: hidden;
-			max-width: 800px;
-			margin: 0 auto;
-			}
-			h1, p {
-			font-family: sans-serif;
-			text-align: center;
-			padding: 20px;
+			background-color:cyan;
 			}
 			button{
-			font-family: sans-serif;
-			text-align: center;
-			padding: 20px;
 			background-color:azure;
-			}
-			div {
-			height: 100px;
-			overflow: auto;
-			position: absolute;
-			bottom: 0px;
-			right: 0;
-			left: 0;
-			background-color: rgba(255,255,255,0.2);
+			border-radius: 50%;
+			height:50px;
+			width:50px;
 			}
 		</style>
 	</head>
 	<body align="center" >
+		<button id="start"></button>
 		<p id="output"></p>
-		<button id="start">Start</button>
 		<script type="text/javascript">
 			var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
 			var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
@@ -54,19 +32,18 @@
 			recognition.interimResults = false;
 			recognition.maxAlternatives = 1;
 			document.getElementById("start").onclick=function() {
-				document.getElementById("start").innerHTML="Listening...";
 				recognition.start();
 			}
 			recognition.onresult = function(event) {
 				var col=event.results[0][0].transcript;
-				document.getElementById("output").innerHTML=col+"?";
+				document.getElementById("output").innerHTML=col;
 				document.querySelector('html').style.backgroundColor=col;
+				document.querySelector('body').style.backgroundColor=col;
 				if(col==="weather"){
 					document.getElementById("output").innerHTML="Weather is ";
 				}
 			}
 			recognition.onspeechend = function() {
-				document.getElementById("start").innerHTML="Start";
 				recognition.stop();
 			}
 			recognition.onerror = function(event) {
